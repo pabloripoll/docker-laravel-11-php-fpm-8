@@ -26,6 +26,7 @@ DOCKER_COMPOSE_RUN=$(DOCKER_COMPOSE) run --rm
 DOCKER_EXEC_TOOLS_APP=$(DOCKER_USER) docker exec -it $(DOCKER_CAAS) sh
 
 COMPOSER_UPDATE="composer update"
+COMPOSER_INSTALL="composer create-project laravel/laravel:^11.0 ."
 
 help: ## shows this Makefile help message
 	echo 'usage: make [target]'
@@ -70,19 +71,13 @@ env-set: ## sets docker .env file
 # -------------------------------------------------------------------------------------------------
 #  Container
 # -------------------------------------------------------------------------------------------------
-.PHONY: ssh build install update dev up start first stop restart clear
+.PHONY: ssh build install-app update-app dev up start first stop restart clear
 
 ssh:
 	$(DOCKER_EXEC_TOOLS_APP)
 
 build:
 	cd docker && $(DOCKER_COMPOSE) up --build --no-recreate -d
-
-install:
-	cd docker && $(DOCKER_EXEC_TOOLS_APP) -c composer create-project laravel/laravel:^11.0 .
-
-update:
-	cd docker && $(DOCKER_EXEC_TOOLS_APP) -c $(COMPOSER_INSTALL)
 
 dev:
 	echo ${C_YEL}"\"dev\" recipe has not usage in this project"${C_END};
@@ -91,20 +86,30 @@ up:
 	cd docker && $(DOCKER_COMPOSE) up -d
 
 start:
-	$(MAKE) build up
-
-first:
-	$(MAKE) build install up
+	$(MAKE) up
 
 stop:
-	cd docker && $(DOCKER_COMPOSE) kill || true
-	cd docker && $(DOCKER_COMPOSE) rm --force || true
+	cd docker && $(DOCKER_COMPOSE) stop
 
 restart:
 	$(MAKE) stop start
 
 clear:
+	cd docker && $(DOCKER_COMPOSE) kill || true
+	cd docker && $(DOCKER_COMPOSE) rm --force || true
 	cd docker && $(DOCKER_COMPOSE) down -v --remove-orphans || true
+
+destroy:
+	cd docker && $(DOCKER_USER) docker rmi $(DOCKER_CAAS):$(DOCKER_ABBR)-nginx-php
+
+# -------------------------------------------------------------------------------------------------
+#  Container Application
+# -------------------------------------------------------------------------------------------------
+app-install:
+	$(DOCKER_EXEC_TOOLS_APP) -c $(COMPOSER_INSTALL)
+
+app-update:
+	cd docker && $(DOCKER_EXEC_TOOLS_APP) -c $(COMPOSER_UPDATE)
 
 # -------------------------------------------------------------------------------------------------
 #  Container update on the run
