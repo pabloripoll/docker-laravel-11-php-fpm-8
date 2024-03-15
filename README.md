@@ -4,17 +4,9 @@
             style="width:150px;float:left;"
             src="https://pabloripoll.com/files/logo-light-100x300.png"/>
     </a>
-    <a href="https://github.com/pabloripoll?tab=repositories">
-        <img
-            style="float:left;"
-            src="https://laravel.com/img/logomark.min.svg"/>
-        <img
-            style="float:left;"
-            src="https://laravel.com/img/logotype.min.svg"/>
-    </a>
 </div>
 
-# Dockerized Laravel 11 with MariaDB
+# Dockerized Laravel 11 with MariaDB 10.11
 
 The objective of this repository is having a CaaS [Containers as a Service](https://www.ibm.com/topics/containers-as-a-service) to provide a start up application with the basic enviroment features to deploy a php service running with Nginx and PHP-FPM in a container for [Laravel](https://laravel.com/) and another container with a MySQL database to follow the best practices on an easy scenario to understand and modify on development requirements.
 
