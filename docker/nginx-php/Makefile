@@ -109,7 +109,7 @@ app-install:
 	$(DOCKER_EXEC_TOOLS_APP) -c $(COMPOSER_INSTALL)
 
 app-update:
-	cd docker && $(DOCKER_EXEC_TOOLS_APP) -c $(COMPOSER_UPDATE)
+	$(DOCKER_EXEC_TOOLS_APP) -c $(COMPOSER_UPDATE)
 
 # -------------------------------------------------------------------------------------------------
 #  Container update on the run
