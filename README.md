@@ -4,6 +4,14 @@
             style="width:150px;float:left;"
             src="https://pabloripoll.com/files/logo-light-100x300.png"/>
     </a>
+    <a href="https://github.com/pabloripoll?tab=repositories">
+        <img
+            style="float:left;"
+            src="https://laravel.com/img/logomark.min.svg"/>
+        <img
+            style="float:left;"
+            src="https://laravel.com/img/logotype.min.svg"/>
+    </a>
 </div>
 
 # Dockerized Laravel 11 with MariaDB
