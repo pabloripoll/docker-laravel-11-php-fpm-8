@@ -6,6 +6,14 @@
     </a>
 </div>
 
+<div style="width:100%;float:left;clear:both;margin-bottom:50px;">
+    <a href="resources/doc/laravel-11-screenshot.png">
+        <img
+            style="width:100%;float:left;"
+            src="resources/doc/laravel-11-screenshot.png"/>
+    </a>
+</div>
+
 # Dockerized Laravel 11 with MariaDB 10.11
 
 The objective of this repository is having a CaaS [Containers as a Service](https://www.ibm.com/topics/containers-as-a-service) to provide a start up application with the basic enviroment features to deploy a php service running with Nginx and PHP-FPM in a container for [Laravel](https://laravel.com/) and another container with a MySQL database to follow the best practices on an easy scenario to understand and modify on development requirements.
