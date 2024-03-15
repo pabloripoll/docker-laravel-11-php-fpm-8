@@ -113,7 +113,7 @@ project-stop: ## stops both Laravel and database containers but data won't be de
 	$(MAKE) database-stop laravel-stop
 
 project-destroy: ## stops and removes both Laravel and database containers from Docker network destroying their data
-	$(MAKE) database-destroy laravel-destroy
+	$(MAKE) database-clear laravel-clear database-destroy laravel-destroy
 
 # -------------------------------------------------------------------------------------------------
 #  Repository Helper
