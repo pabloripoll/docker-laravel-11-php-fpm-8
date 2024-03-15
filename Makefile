@@ -40,7 +40,10 @@ ports-check: ## shows this project ports availability on local machine
 # -------------------------------------------------------------------------------------------------
 #  Laravel Service
 # -------------------------------------------------------------------------------------------------
-.PHONY: laravel-ssh laravel-set laravel-build laravel-start laravel-stop laravel-destroy
+.PHONY: laravel-install laravel-ssh laravel-set laravel-build laravel-start laravel-stop laravel-destroy
+
+laravel-install: ## installs latest Laravel into container
+	cd docker/nginx-php && $(MAKE) app-install
 
 laravel-ssh: ## enters the Laravel container shell
 	cd docker/nginx-php && $(MAKE) ssh
