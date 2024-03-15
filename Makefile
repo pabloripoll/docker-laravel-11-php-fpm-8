@@ -121,4 +121,4 @@ laravel-stop: ## stops the Laravel PHP container but data won't be destroyed
 	cd docker/nginx-php && $(MAKE) stop
 
 laravel-destroy: ## stops and removes the Laravel PHP container from Docker network destroying its data
-	cd docker/nginx-php && $(MAKE) stop clear
+	cd docker/nginx-php && $(MAKE) clear destroy
