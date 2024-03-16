@@ -84,7 +84,7 @@ database-stop: ## stops the database container but data won't be destroyed
 	cd docker/mariadb && $(MAKE) stop
 
 database-destroy: ## stops and removes the database container from Docker network destroying its data
-	cd docker/mariadb && $(MAKE) stop clear
+	cd docker/mariadb && $(MAKE) clear destroy
 
 database-install: ## installs an initialized database copying the determined .sql file into the container by raplacing it
 	cd docker/mariadb && $(MAKE) sql-install
@@ -116,7 +116,7 @@ project-stop: ## stops both Laravel and database containers but data won't be de
 	$(MAKE) database-stop laravel-stop
 
 project-destroy: ## stops and removes both Laravel and database containers from Docker network destroying their data
-	$(MAKE) database-clear laravel-clear database-destroy laravel-destroy
+	$(MAKE) database-destroy laravel-destroy
 
 # -------------------------------------------------------------------------------------------------
 #  Repository Helper
