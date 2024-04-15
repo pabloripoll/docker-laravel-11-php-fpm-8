@@ -43,7 +43,6 @@ RUN set -xe \
         libpng-dev \
         libxslt-dev \
         patch \
-        mercurial \
         openssh-client
 
 # Install PHP and its extensions packages and remove default server definition
@@ -85,6 +84,11 @@ RUN apk add --no-cache \
 
 # PHP Docker
 RUN docker-php-ext-install pdo pdo_mysql gd
+
+# PHP PECL extensions
+RUN apk add \
+  ${PHP_V}-pecl-amqp \
+  ${PHP_V}-pecl-xdebug
 
 # Configure nginx - http
 COPY config/nginx.conf /etc/nginx/nginx.conf
