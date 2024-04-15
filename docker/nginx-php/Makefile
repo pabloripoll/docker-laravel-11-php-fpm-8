@@ -97,7 +97,7 @@ clear: ## removes container from Docker running containers
 	cd docker && $(DOCKER_COMPOSE) down -v --remove-orphans || true
 
 destroy: ## delete container image from Docker - Docker prune commands still needed to be applied manually
-	cd docker && $(DOCKER_USER) docker rmi $(DOCKER_CAAS):$(DOCKER_ABBR)-nginx-php
+	cd docker && $(DOCKER_USER) docker rmi $(DOCKER_CAAS):$(DOCKER_ABBR)
 
 dev: ## set a development enviroment
 	echo ${C_YEL}"\"dev\" recipe has not usage in this project"${C_END};
@@ -119,7 +119,7 @@ app-update: ## updates dependencies packages
 .PHONY: nginx-conf php-conf php-fpm-conf
 
 nginx-conf: ## updates any configuration NGINX changes while container is running
-	$(DOCKER_USER) docker run -v "`pwd`/nginx-server.conf:/etc/nginx/conf.d/server.conf" $(DOCKER_CAAS):$(DOCKER_ABBR)-nginx-php
+	$(DOCKER_USER) docker run -v "`pwd`/nginx-server.conf:/etc/nginx/conf.d/server.conf" $(DOCKER_CAAS):$(DOCKER_ABBR)
 
 php-conf: ## updates any configuration PHP changes while container is running
 	$(DOCKER_USER) docker run -v "`pwd`/php-setting.ini:/etc/php83/conf.d/settings.ini" $(DOCKER_CAAS)
