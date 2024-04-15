@@ -219,8 +219,8 @@ Create a [DOTENV](.env) file from [.env.example](.env.example) and setup accordi
 DOCKER_USER=sudo
 
 # Container data for docker-compose.yml
-PROJECT_TITLE="LARAVEL"   # <- this name will be prompt for Makefile recipes
-PROJECT_ABBR="laravel"    # <- part of the service image tag - useful if similar services are running
+PROJECT_TITLE="LARAVEL"         # <- this name will be prompt for Makefile recipes
+PROJECT_ABBR="lara-nginx-php"   # <- part of the service image tag - useful if similar services are running
 
 # Laravel container
 PROJECT_HOST="127.0.0.1"                    # <- for this project is not necessary
