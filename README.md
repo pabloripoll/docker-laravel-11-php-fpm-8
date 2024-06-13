@@ -10,7 +10,7 @@
     </a>
 </div>
 
-# Docker Laravel 11 with PHP FPM 8+
+# Docker Laravel 11 with PHP FPM 8.3
 
 The objective of this repository is having a CaaS [Containers as a Service](https://www.ibm.com/topics/containers-as-a-service) to provide a start up application with the basic enviroment features to deploy a php service running with Nginx and PHP-FPM in a container for [Laravel](https://laravel.com/) and another container with a MySQL database to follow the best practices on an easy scenario to understand and modify on development requirements.
 
@@ -18,22 +18,25 @@ The connection between container is as [Host Network](https://docs.docker.com/ne
 
 As client end user both services can be accessed through `localhost:${PORT}` but the connection between containers is through the `${HOSTNAME}:${PORT}`.
 
-### Laravel Docker Container Service
+### Backend Container Service
 
 - [Laravel 11](https://laravel.com/docs/11.x/releases)
-
 - [PHP-FPM 8.3](https://www.php.net/releases/8.3/en.php)
-
 - [Nginx 1.24](https://nginx.org/)
-
 - [Alpine Linux 3.19](https://www.alpinelinux.org/)
 
-### Database Service
+### Database Container Service
 
 This project does not include a database service for it is intended to connect to a database instance like in a cloud database environment or similar.
 
 To emulate a SQL database service it can be used the following [MariaDB 10.11](https://mariadb.com/kb/en/changes-improvements-in-mariadb-1011/) repository:
 - [https://github.com/pabloripoll/docker-mariadb-10.11](https://github.com/pabloripoll/docker-mariadb-10.11)
+
+### Frontend Container Service
+
+- [NodeJS 22.2](https://nodejs.org/en/download/package-manager)
+- [Nginx 1.24](https://nginx.org/)
+- [Alpine Linux 3.20](https://www.alpinelinux.org/)
 
 ### Project objetives with Docker
 
@@ -50,7 +53,7 @@ To emulate a SQL database service it can be used the following [MariaDB 10.11](h
 
 #### PHP config
 
-To use a different PHP 8 version the following [Dockerfile](docker/nginx-php/docker/Dockerfile) arguments and variable has to be modified:
+To use a different PHP 8 version the following [Dockerfile](infrastructure/nginx-php/infrastructure/Dockerfile) arguments and variable has to be modified:
 ```Dockerfile
 ARG PHP_VERSION=8.3
 ARG PHP_ALPINE=83
@@ -58,7 +61,7 @@ ARG PHP_ALPINE=83
 ENV PHP_V="php83"
 ```
 
-Also, it has to be informed to [Supervisor Config](docker/nginx-php/docker/config/supervisord.conf) the PHP-FPM version to run.
+Also, it has to be informed to [Supervisor Config](infrastructure/nginx-php/infrastructure/config/supervisord.conf) the PHP-FPM version to run.
 ```bash
 ...
 [program:php-fpm]
@@ -140,11 +143,11 @@ RUN apk add \
 
 ## Directories Structure
 
-Directories and main files on a tree architecture description. Main `/docker` directory has `/nginx-php` directory separated in case of needing to be included other container service directory with its specific contents
+Directories and main files on a tree architecture description. The `/infrastructure` directory has `/nginx-php` directory separated in case of needing to be included other container service directory with its specific contents
 ```
 .
 │
-├── docker
+├── infrastructure
 │   │
 │   ├── nginx-php
 │   │   ├── docker
@@ -160,17 +163,17 @@ Directories and main files on a tree architecture description. Main `/docker` di
 ├── resources
 │   │
 │   ├── database
-│   │   ├── laravel-init.sql
-│   │   └── laravel-backup.sql
+│   │   ├── mariadb-init.sql
+│   │   └── mariadb-backup.sql
 │   │
 │   ├── doc
-│   │   └── (any documentary file...)
+│   │   └── (any documentary files...)
 │   │
-│   └── laravel
+│   └── backend
 │       └── (any file or directory required for start-up or re-building the app...)
 │
-├── laravel
-│   └── (application...)
+├── backend
+│   └── (Laravel application...)
 │
 ├── .env
 ├── .env.example
@@ -194,19 +197,18 @@ Makefile  help                    shows this Makefile help message
 Makefile  hostname                shows local machine ip
 Makefile  fix-permission          sets project directory permission
 Makefile  host-check              shows this project ports availability on local machine
-Makefile  laravel-ssh             enters the application container shell
-Makefile  laravel-set             sets the application PHP enviroment file to build the container
-Makefile  laravel-create          creates the application PHP container from Docker image
-Makefile  laravel-start           starts the application PHP container running
-Makefile  laravel-stop            stops the application PHP container but data will not be destroyed
-Makefile  laravel-destroy         removes the application PHP from Docker network destroying its data and Docker image
-Makefile  laravel-install         installs the application pre-defined version with its dependency packages into container
-Makefile  laravel-update          updates the application dependency packages into container
+Makefile  project-set             sets the project enviroment file to build the container
+Makefile  project-create          creates the project container from Docker image
+Makefile  project-start           starts the project container running
+Makefile  project-stop            stops the project container but data won't be destroyed
+Makefile  project-destroy         removes the project from Docker network destroying its data and Docker image
+Makefile  backend-ssh             enters the backend container shell
+Makefile  backend-update          updates the backend set version into container
 Makefile  database-install        installs into container database the init sql file from resources/database
 Makefile  database-replace        replaces container database with the latest sql backup file from resources/database
 Makefile  database-backup         creates / replace a sql backup file from container database in resources/database
 Makefile  repo-flush              clears local git repository cache specially to update .gitignore
-Makefile  repo-commit             echoes commit helper commands
+Makefile  repo-commit             echoes common git commands
 ```
 
 ## Service Configuration
@@ -219,37 +221,46 @@ Create a [DOTENV](.env) file from [.env.example](.env.example) and setup accordi
 DOCKER_USER=sudo
 
 # Container data for docker-compose.yml
-PROJECT_TITLE="LARAVEL"         # <- this name will be prompt for Makefile recipes
-PROJECT_ABBR="lara-nginx-php"   # <- part of the service image tag - useful if similar services are running
+PROJECT_NAME="PR PROJECT"       # <- this name will be prompt for automation commands
+PROJECT_ABBR="pr-proj"          # <- part of the service image tag - useful if similar services are running
+PROJECT_HOST="127.0.0.1"        # <- for this project is not necessary
 
-# Laravel container
-PROJECT_HOST="127.0.0.1"                    # <- for this project is not necessary
-PROJECT_PORT="8888"                         # <- port access container service on local machine
-PROJECT_CAAS="laravel-app"                  # <- container as a service name to build service
-PROJECT_PATH="../../../laravel"             # <- path where application is binded from container to local
+FRONTEND_IMGK="-nxjs"               # <- container image key to manage docker image created
+FRONTEND_PORT="8890"                # <- local machine port opened for container service
+FRONTEND_CAAS="proj-front"          # <- container name to build the service
+FRONTEND_BIND="../../../frontend"   # <- path where application is binded from container to local
 
-# Database service container
-DB_CAAS="mariadb"                           # <- name of the database docker container service to access by ssh
-DB_NAME="mariadb"                           # <- name of the database to copy or replace
-DB_ROOT="7c4a8d09ca3762af61e59520943d"      # <- database root password
-DB_BACKUP_NAME="laravel"                    # <- the name of the database backup or copy file
-DB_BACKUP_PATH="resources/database"         # <- path where database backup or copy resides
+BACKEND_IMGK="-nxphp"               # <- container image key to manage docker image created
+BACKEND_PORT="8891"                 # <- local machine port opened for container service
+BACKEND_CAAS="proj-back"            # <- container name to build the service
+BACKEND_BIND="../../../backend"     # <- path where application is binded from container to local
+
+DATABASE_IMGK="-mdb"                # <- container image key to manage docker image created
+DATABASE_PORT="8892"                # <- local machine port opened for container service
+DATABASE_CAAS="proj-mariadb"        # <- container name to build the service
+DATABASE_ROOT="eYVX7EwVmmxKPCD"     # <- mariadb root password
+DATABASE_NAME="mariadb"             # <- mariadb database name
+DATABASE_USER="mariadb"             # <- mariadb database user
+DATABASE_PASS="123456"              # <- mariadb database password
+DB_BACKUP_NAME="mariadb"            # <- the name of the database backup or copy file
+DB_BACKUP_PATH="resources/database" # <- path where database backup or copy resides
 ```
 
 *(Database service container is explained [below](https://github.com/pabloripoll/docker-symfony-6-php-fpm-8?tab=readme-ov-file#custom-database-service-usage))*
 
-Exacute the following command to create the [docker/.env](docker/.env) file, required for building the container
+Exacute the following command to create the [infrastructure/nginx-php/.env](infrastructure/nginx-php/.env) file, required for building the container
 ```bash
-$ make laravel-set
-LARAVEL docker-compose.yml .env file has been set.
+$ make backend-set
+
+PR PROJECT - LARAVEL 11 docker-compose.yml .env file has been set.
 ```
 
 Checkout port availability from the set enviroment
 ```bash
 $ make host-check
 
-Checking configuration for LARAVEL container:
-LARAVEL > port:8888 is free to use.
+Checking configuration for PR PROJECT - LARAVEL 11 container:
+PR PROJECT - LARAVEL 11 > port:8888 is free to use.
 ```
 
 Checkout local machine IP to set connection between container services using the following makefile recipe if required
@@ -261,57 +272,77 @@ $ make hostname
 
 ## Create the application container service
 
+For this repository only backend service automation is set
 ```bash
-$ make laravel-create
+$ make project-create
+```
 
-LARAVEL docker-compose.yml .env file has been set.
+If is needed to create other infrastucture containers, update the root [Makefile](Makefile)
+```Makefile
+host-check: ## shows this project ports availability on local machine
+	cd infrastructure/mariadb && $(MAKE) port-check
+	cd infrastructure/nginx-php && $(MAKE) port-check
+	cd infrastructure/nodejs-angular && $(MAKE) port-check
 
-[+] Building 54.3s (26/26) FINISHED                                       docker:default
-=> [nginx-php internal] load build definition from Dockerfile                       0.0s
- => => transferring dockerfile: 2.78kB                                              0.0s
- => [nginx-php internal] load metadata for docker.io/library/composer:latest        1.5s
- => [nginx-php internal] load metadata for docker.io/library/php:8.3-fpm-alpine     1.5s
- => [nginx-php internal] load .dockerignore                                         0.0s
- => => transferring context: 108B                                                   0.0s
- => [nginx-php internal] load build context                                         0.0s
- => => transferring context: 8.30kB                                                 0.0s
- => [nginx-php] FROM docker.io/library/composer:latest@sha256:63c0f08ca41370...
-...
- => [nginx-php] exporting to image                                                  1.0s
- => => exporting layers                                                             1.0s
- => => writing image sha256:3c99f91a63edd857a0eaa13503c00d500fad57cf5e29ce1d...     0.0s
- => => naming to docker.io/library/laravel-app:laravel-nginx-php                    0.0s
-[+] Running 1/2
- ⠴ Network laravel-app_default  Created                                             0.4s
- ✔ Container laravel-app        Started                                             0.3s
-[+] Running 1/0
- ✔ Container laravel-app        Running
+project-set: ## sets the project enviroment file to build the container
+	cd infrastructure/mariadb && $(MAKE) env-set
+	cd infrastructure/nginx-php && $(MAKE) env-set
+	cd infrastructure/nodejs-angular && $(MAKE) env-set
+
+project-create: ## creates the project container from Docker image
+	cd infrastructure/mariadb && $(MAKE) env-set build up
+	cd infrastructure/nginx-php && $(MAKE) env-set build up
+	cd infrastructure/nodejs-angular && $(MAKE) env-set build up
+
+project-start: ## starts the project container running
+	cd infrastructure/mariadb && $(MAKE) start
+	cd infrastructure/nginx-php && $(MAKE) start
+	cd infrastructure/nodejs-angular && $(MAKE) start
+
+project-stop: ## stops the project container but data won't be destroyed
+	cd infrastructure/mariadb && $(MAKE) stop
+	cd infrastructure/nginx-php && $(MAKE) stop
+	cd infrastructure/nodejs-angular && $(MAKE) stop
+
+project-destroy: ## removes the project from Docker network destroying its data and Docker image
+	cd infrastructure/mariadb && $(MAKE) clear destroy
+	cd infrastructure/nginx-php && $(MAKE) clear destroy
+	cd infrastructure/nodejs-angular && $(MAKE) clear destroy
 ```
 
 ## Project Service
 
-If the container is built with the pre-installed application content, by browsing to localhost with the selected port configured [http://localhost:8888/](http://localhost:8888/) will display the successfully installation welcome page.
+If the container is built with the pre-installed application content, by browsing to localhost with the selected port configured [http://localhost:8891/](http://localhost:8891/) will display the successfully installation welcome page.
 
-The pre-installed application could require to update its dependencies. The following Makefile recipe will update dependencies set on `composer.json` file
+The pre-installed application dependencies requires to updated on any creation. The following Makefile recipe will update dependencies set on `composer.json` file
+
 ```bash
-$ make laravel-update
+$ make backend-update
 ```
 
-If it is needed to build the container with other type of application configuration from base, there is a Makefile recipe to set at [docker/Makefile](docker/Makefile) all the commands needed for its installation.
+Also can be performed by
 ```bash
-$ make laravel-install
+$ cd infrastructure/nginx-php
+$ make app-update
+```
+
+If it is needed to build the container with other type of application configurations from base, there is a Makefile recipe to set at [infrastructure/Makefile](infrastructure/Makefile) all the commands needed for its installation.
+
+```bash
+$ cd infrastructure/nginx-php
+$ make app-install
 ```
 
 ## Container Information
 
-Docker image size
+Docker image size example
 ```bash
 $ sudo docker images
 REPOSITORY   TAG           IMAGE ID       CREATED         SIZE
 laravel-app  lara...       373f6967199b   5 minutes ago   251MB
 ```
 
-Stats regarding the amount of disk space used by the container
+Stats regarding the amount of disk space used by the container example
 ```bash
 $ sudo docker system df
 TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
@@ -325,50 +356,35 @@ Build Cache     39        0         10.56kB   10.56kB
 
 Using the following Makefile recipe stops application from running, keeping database persistance and application files binded without any loss
 ```bash
-$ make laravel-stop
-[+] Stopping 1/1
- ✔ Container laravel-app  Stopped                                                    0.5s
+$ make backend-stop
 ```
 
 ## Removing the Container Image
 
 To remove application container from Docker network use the following Makefile recipe *(Docker prune commands still needed to be applied manually)*
 ```bash
-$ make laravel-destroy
-
-[+] Removing 1/0
- ✔ Container laravel-app  Removed                                                     0.0s
-[+] Running 1/1
- ✔ Network laravel-app_default  Removed                                               0.4s
-Untagged: laravel-app:laravel-nginx-php
-Deleted: sha256:3c99f91a63edd857a0eaa13503c00d500fad57cf5e29ce1da3210765259c35b1
+$ make backend-destroy
 ```
 
-Information on pruning Docker system cache
+Prune Docker system cache
 ```bash
 $ sudo docker system prune
-
-...
-Total reclaimed space: 168.4MB
 ```
 
-Information on pruning Docker volume cache
+Prune Docker volume cache *(if a database was created)*
 ```bash
 $ sudo docker volume prune
-
-...
-Total reclaimed space: 0MB
 ```
 
-## Laravel service check
+## Backend Service Check
 
-There are two PHP files on [resources/laravel](resources/laravel) with same structure as application to replace or add a predifined example to test the service.
+There are two PHP files on [resources/backend](resources/backend) with same structure as application to replace or add a predifined example to test the service.
 
 It can be used an API platform service *(Postman, Firefox RESTClient, etc..)* or just browsing the following endpoints to check connection with Laravel.
 
 Check-out a basic service check
 ```
-GET: http://localhost:8888/api/v1/health
+GET: http://localhost:8891/api/v1/health
 
 {
     "status": true
@@ -377,7 +393,7 @@ GET: http://localhost:8888/api/v1/health
 
 Check connection to database through this endpoint. If conenction params are not set already or does not exist, endpoint response will be as follow
 ```
-GET: http://localhost:8888/api/v1/health/db
+GET: http://localhost:8891/api/v1/health/db
 
 {
     "status": false,
@@ -394,33 +410,16 @@ GET: http://localhost:8888/api/v1/health/db
 
 When a proper connection is set, endpoint will response as follow
 ```
-GET: http://localhost:8888/api/v1/health/db
+GET: http://localhost:8891/api/v1/health/db
 
 {
     "status": true
 }
 ```
 
-## Custom database service usage
+## Database
 
-In case of using the repository [https://github.com/pabloripoll/docker-mariadb-10.11](https://github.com/pabloripoll/docker-mariadb-10.11) as database service, complete the application mysql database connection params in [laravel/.env](laravel/.env) file.
-
-Use local hostname IP `$ make hostname` to set `DB_HOST` variable
-```
-DB_CONNECTION=mysql
-DB_HOST=192.168.1.41
-DB_PORT=8880
-DB_DATABASE=mariadb
-DB_USERNAME=mariadb
-DB_PASSWORD=123456
-```
-
-Migration has to be performed inside container. Access container with the following recipe:
-```bash
-$ make laravel-ssh
-```
-
-### Dumping Database
+This repository comes with an initialized .sql with a main database user. See [.env.example](.env.example)
 
 Every time the containers are built up and running it will be like start from a fresh installation.
 
@@ -428,18 +427,9 @@ You can continue using this repository with the pre-set database executing the c
 
 Follow the next recommendations to keep development stages clear and safe.
 
-*On first installation* once the app service is running with basic tables set, I suggest to make a initialization database backup manually, saving as [resources/database/laravel-backup.sql](resources/database/laravel-backup.sql) but renaming as [resources/database/laravel-init.sql](resources/database/laravel-init.sql) to have that init database for any Docker compose rebuild / restart on next time.
+*On first installation* once the app service is running with basic tables set, I suggest to make a initialization database backup manually, saving as [resources/database/mariadb-backup.sql](resources/database/mariadb-backup.sql) but renaming as [resources/database/mariadb-init.sql](resources/database/mariadb-init.sql) to have that init database for any Docker compose rebuild / restart on next time.
 
 **The following three commands are very useful for *Continue Development*.**
-
-### DB Backup
-
-When the project is already in an advanced development stage, making a backup is recommended to keep lastest database registers.
-```bash
-$ make database-backup
-
-DATABASE backup has been created.
-```
 
 ### DB Install
 
@@ -447,10 +437,17 @@ If it is needed to restart the project from base installation step, you can use 
 ```bash
 $ make database-install
 
-DATABASE has been installed.
+PR PROJECT - DATABASE has been installed.
 ```
 
-This repository comes with an initialized .sql with a main database user. See [.env.example](.env.example)
+### DB Backup
+
+When the project is already in an advanced development stage, making a backup is recommended to keep lastest database registers.
+```bash
+$ make database-backup
+
+PR PROJECT - DATABASE backup has been created.
+```
 
 ### DB Replace
 
@@ -458,7 +455,7 @@ Replace the database set on container with the latest .sql backup into current d
 ```bash
 $ make database-replace
 
-DATABASE has been replaced.
+PR PROJECT - DATABASE has been replaced.
 ```
 
 #### Notes
@@ -467,9 +464,9 @@ DATABASE has been replaced.
 
 - Remember that on any change in the main `.env` file will be required to execute the following Makefile recipe
 ```bash
-$ make laravel-set
+$ make project-set
 
-LARAVEL docker-compose.yml .env file has been set.
+PR PROJECT - BACKEND docker-compose.yml .env file has been set.
 ```
 
 ## Connection between containers

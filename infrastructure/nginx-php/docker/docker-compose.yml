@@ -1,0 +1,24 @@
+services:
+  nginx-php:
+    image: ${COMPOSE_PROJECT_NAME}:${COMPOSE_PROJECT_ABBR}${COMPOSE_PROJECT_IMGK}
+    pull_policy: never
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    container_name: ${COMPOSE_PROJECT_NAME}
+    ports:
+      - ${COMPOSE_PROJECT_PORT}:80
+    volumes:
+      - type: bind
+        source: ${COMPOSE_PROJECT_PATH}
+        target: /var/www/htdocs
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail http://${COMPOSE_PROJECT_HOST}:${COMPOSE_PROJECT_PORT}/fpm-ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    tty: true
+    restart: unless-stopped
