@@ -282,32 +282,32 @@ If is needed to create other infrastucture containers, update the root [Makefile
 host-check: ## shows this project ports availability on local machine
 	cd infrastructure/mariadb && $(MAKE) port-check
 	cd infrastructure/nginx-php && $(MAKE) port-check
-	cd infrastructure/nodejs-angular && $(MAKE) port-check
+	cd infrastructure/nginx-nodejs && $(MAKE) port-check
 
 project-set: ## sets the project enviroment file to build the container
 	cd infrastructure/mariadb && $(MAKE) env-set
 	cd infrastructure/nginx-php && $(MAKE) env-set
-	cd infrastructure/nodejs-angular && $(MAKE) env-set
+	cd infrastructure/nginx-nodejs && $(MAKE) env-set
 
 project-create: ## creates the project container from Docker image
 	cd infrastructure/mariadb && $(MAKE) env-set build up
 	cd infrastructure/nginx-php && $(MAKE) env-set build up
-	cd infrastructure/nodejs-angular && $(MAKE) env-set build up
+	cd infrastructure/nginx-nodejs && $(MAKE) env-set build up
 
 project-start: ## starts the project container running
 	cd infrastructure/mariadb && $(MAKE) start
 	cd infrastructure/nginx-php && $(MAKE) start
-	cd infrastructure/nodejs-angular && $(MAKE) start
+	cd infrastructure/nginx-nodejs && $(MAKE) start
 
 project-stop: ## stops the project container but data won't be destroyed
 	cd infrastructure/mariadb && $(MAKE) stop
 	cd infrastructure/nginx-php && $(MAKE) stop
-	cd infrastructure/nodejs-angular && $(MAKE) stop
+	cd infrastructure/nginx-nodejs && $(MAKE) stop
 
 project-destroy: ## removes the project from Docker network destroying its data and Docker image
 	cd infrastructure/mariadb && $(MAKE) clear destroy
 	cd infrastructure/nginx-php && $(MAKE) clear destroy
-	cd infrastructure/nodejs-angular && $(MAKE) clear destroy
+	cd infrastructure/nginx-nodejs && $(MAKE) clear destroy
 ```
 
 ## Project Service
